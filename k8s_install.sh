@@ -1,16 +1,16 @@
 #!/bin/bash
 set -e
 
-apt install -y apt-transport-https ca-certificates curl ebtables
+apt update && apt install -y apt-transport-https ca-certificates curl ebtables
 
 echo "*** Install containerd and runC ***"
-apt install -y --no-install-recommends apt-transport-https ca-certificates curl software-properties-common gnupg lsb-release
+apt update && apt install -y --no-install-recommends apt-transport-https ca-certificates curl software-properties-common gnupg lsb-release
 mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 echo \
           "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
             $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-apt install -y --no-install-recommends containerd.io
+apt update && apt install -y --no-install-recommends containerd.io
 systemctl start containerd
 systemctl enable containerd
 
@@ -23,7 +23,7 @@ systemctl restart containerd
 echo "*** Install Kubernetes ***"
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /" | tee /etc/apt/sources.list.d/kubernetes.list
-apt install -y kubeadm kubelet kubectl kubernetes-cni
+apt update && apt install -y kubeadm kubelet kubectl kubernetes-cni
 apt-mark hold kubelet kubeadm kubectl
 
 swapoff -a
