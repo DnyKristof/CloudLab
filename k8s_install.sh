@@ -28,3 +28,5 @@ apt-mark hold kubelet kubeadm kubectl
 
 swapoff -a
 sed -i '/ swap / s/^/#/' /etc/fstab
+
+sysctl net.ipv4.ip_forward=1
