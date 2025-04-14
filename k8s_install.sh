@@ -14,7 +14,7 @@ apt install -y --no-install-recommends containerd.io
 systemctl start containerd
 systemctl enable containerd
 
-mv etc/containerd/config.toml etc/containerd/config.toml.orig
+mv /etc/containerd/config.toml /etc/containerd/config.toml.orig
 containerd config default | sudo tee /etc/containerd/config.toml
 sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
 systemctl restart containerd
