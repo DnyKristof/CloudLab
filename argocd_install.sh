@@ -5,6 +5,8 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/st
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 echo "Access: "
 kubectl get svc -n argocd argocd-server
+echo "Waiting for service to load"
+sleep 30
 echo "Username: admin"
 echo "Password : $(kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d && echo) "
 
