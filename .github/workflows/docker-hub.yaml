@@ -52,6 +52,7 @@ jobs:
       - name: Update deployment.yaml image tag
         run: |
           sed -i "s|\(image: zylean/${{ env.IMAGE_NAME }}:\).*|\1${TAG}|" dev/deployment.yaml
+          cat dev/deployment.yaml
 
       - name: Commit and Push Changes
         run: |
