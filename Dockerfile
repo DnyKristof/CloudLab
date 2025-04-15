@@ -1,4 +1,4 @@
-FROM python:lastest
+FROM python:3
 RUN pip3 install flask requests
 RUN useradd pythonuser -ms /bin/bash
 WORKDIR /home/pythonuser/app
