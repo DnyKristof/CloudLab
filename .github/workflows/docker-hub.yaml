@@ -35,3 +35,26 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${TAG}
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+
+  update-deployment-yaml:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Extract Tag Name
+        run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Update deployment.yaml image tag
+        run: |
+          sed -i "s|\(image: .*/${{ env.IMAGE_NAME }}:\).*|\1${TAG}|" dev/deployment.yaml
+
+      - name: Commit and Push Changes
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add dev/deployment.yaml
+          git commit -m "Update image tag to ${TAG} in deployment.yaml"
+          git push
