@@ -30,3 +30,7 @@ swapoff -a
 sed -i '/ swap / s/^/#/' /etc/fstab
 
 sysctl net.ipv4.ip_forward=1
+
+modprobe br_netfilter
+echo "br_netfilter" | sudo tee -a /etc/modules-load.d/k8s.conf
+sysctl --system
