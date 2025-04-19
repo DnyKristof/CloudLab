@@ -52,7 +52,7 @@ jobs:
       - name: Update deployment.yaml image tag
         run: |
           cd dev
-          sed -i "s|\(image: zylean/${{ env.IMAGE_NAME }}:\).*|\1${TAG}|" deployment.yaml
+          sed -i "s|\(image: zylean/${{ env.IMAGE_NAME }}:\)[^ ]*|\1${TAG}|" deployment.yaml
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add .
