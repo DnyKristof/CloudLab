@@ -52,12 +52,13 @@ jobs:
       - name: Update deployment.yaml image tag
         run: |
           sed -i "s|\(image: zylean/${{ env.IMAGE_NAME }}:\).*|\1${TAG}|" dev/deployment.yaml
-          cat dev/deployment.yaml
+          
 
       - name: Commit and Push Changes
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
+          git checkout main
           git add dev/deployment.yaml
           git commit -m "Update image tag to ${TAG} in deployment.yaml"
           git push
