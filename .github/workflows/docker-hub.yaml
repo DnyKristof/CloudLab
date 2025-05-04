@@ -49,6 +49,11 @@ jobs:
       - name: Extract Git SHA
         run: echo "GIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
 
+      - name: Debug Variables
+        run: |
+          echo "IMAGE_NAME=${{ env.IMAGE_NAME }}"
+          echo "GIT_SHA=${GIT_SHA}"
+
       - name: Update deployment.yaml image tag
         run: |
           cd dev
