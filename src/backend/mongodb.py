@@ -1,5 +1,7 @@
 import os
 from pymongo import MongoClient
+from dotenv import load_dotenv
+load_dotenv()
 
 
 
@@ -14,7 +16,7 @@ class MongoDB:
         if password is None:
             raise Exception("MONGODB_PASSWORD not set")
         
-        uri = f"mongodb://{username}:{password}@mongodb-service:27017"
+        uri = f"mongodb://{username}:{password}@#mongodb-service:27017" #mongodb-service
 
         self.client = MongoClient(uri)
         self.database = self.client.facedetection

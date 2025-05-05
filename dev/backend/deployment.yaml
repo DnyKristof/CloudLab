@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cloudlab-facedetection
+  name: cloudlab-facedetection-backend
   namespace: facedetection
 spec:
   selector:
     matchLabels:
-      app: cloudlab-facedetection
+      app: cloudlab-facedetection-backend
   replicas: 2
   template:
     metadata:
       labels:
-        app: cloudlab-facedetection
+        app: cloudlab-facedetection-backend
     spec:
       containers:
-      - name: cloudlab-facedetection
-        image: zylean/cloudlab-facedetection:1096722
+      - name: cloudlab-facedetection-backend
+        image: zylean/cloudlab-facedetection-backend:1096722
         ports:
         - containerPort: 5000
         livenessProbe:

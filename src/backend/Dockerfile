@@ -11,7 +11,7 @@ USER facedetector
 WORKDIR /home/facedetector/app
 
 
-COPY src/ .
+COPY . .
 
 
 CMD ["uvicorn", "facedetection:app", "--host", "0.0.0.0", "--port", "5000"]

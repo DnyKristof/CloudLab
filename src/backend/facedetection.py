@@ -1,12 +1,23 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.responses import StreamingResponse
 import cv2
 import numpy as np
 import io
 from mongodb import MongoInit
 
+from fastapi.middleware.cors import CORSMiddleware
+
+
+
 app = FastAPI()
 db = MongoInit()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/health")
@@ -18,7 +29,7 @@ def health_check():
 
 
 @app.post("/detect_faces")
-async def detect_faces(file: UploadFile = File(...)):
+async def detect_faces(file: UploadFile = File(...), description: str = Form("")):
 
     contents = await file.read()
     nparr = np.frombuffer(contents, np.uint8)

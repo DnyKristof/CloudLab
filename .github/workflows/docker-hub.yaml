@@ -6,11 +6,11 @@ on:
       - main
 
 jobs:
-  build-and-push:
+  build-backend:
     runs-on: ubuntu-latest
 
     env:
-      IMAGE_NAME: cloudlab-facedetection
+      IMAGE_NAME: cloudlab-facedetection-backend
 
     steps:
       - name: Checkout Repository
@@ -28,6 +28,38 @@ jobs:
 
       - name: Build Docker Image
         run: |
+          cd src/backend
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${GIT_SHA::7} .
+          docker tag ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${GIT_SHA::7} ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Push Docker Images
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${GIT_SHA::7}
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+
+  build-frontend:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: cloudlab-facedetection-frontend
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Extract Git SHA
+        id: vars
+        run: echo "GIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker Image
+        run: |
+          cd src/frontend
           docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${GIT_SHA::7} .
           docker tag ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${GIT_SHA::7} ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
 
@@ -37,11 +69,12 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
 
   update-deployment-yaml:
-    needs: build-and-push
+    needs: [build-backend, build-frontend]
     runs-on: ubuntu-latest
 
     env:
-      IMAGE_NAME: cloudlab-facedetection
+      IMAGE_NAME_FRONTEND: cloudlab-facedetection-frontend
+      IMAGE_NAME_BACKEND: cloudlab-facedetection-backend
 
     steps:
       - name: Checkout Repository
@@ -52,15 +85,12 @@ jobs:
       - name: Extract Git SHA
         run: echo "GIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
 
-      - name: Debug Variables
-        run: |
-          echo "IMAGE_NAME=${{ env.IMAGE_NAME }}"
-          echo "GIT_SHA=${GIT_SHA}"
-
       - name: Update backend deployment.yaml image tag
         run: |
           cd dev/backend
-          sed -i "s|\(image: .*/${{ env.IMAGE_NAME }}:\)[^ ]*|\1${GIT_SHA::7}|" deployment.yaml
+          sed -i "s|\(image: .*/${{ env.IMAGE_NAME_BACKEND }}:\)[^ ]*|\1${GIT_SHA::7}|" deployment.yaml
+          cd ../frontend
+          sed -i "s|\(image: .*/${{ env.IMAGE_NAME_FRONTEND }}:\)[^ ]*|\1${GIT_SHA::7}|" deployment.yaml
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add deployment.yaml

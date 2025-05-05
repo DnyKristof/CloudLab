@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Face Detection Upload</title>
+</head>
+<body>
+  <h2>Upload an image for face detection</h2>
+  <form id="upload-form">
+    <input type="file" name="file" id="file" required><br><br>
+    <input type="text" name="description" id="description" placeholder="Description"><br><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <h3>Result:</h3>
+  <img id="result-image" style="max-width: 400px; display: none;" />
+
+  <script>
+    const form = document.getElementById('upload-form');
+    const resultImg = document.getElementById('result-image');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData();
+      formData.append("file", document.getElementById("file").files[0]);
+      formData.append("description", document.getElementById("description").value);
+
+      const response = await fetch("http://cloudlab-facedetection-service:5000/detect_faces", {
+        method: "POST",
+        body: formData
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        resultImg.src = url;
+        resultImg.style.display = "block";
+      } else {
+        alert("Face detection failed.");
+      }
+    });
+  </script>
+</body>
+</html>
