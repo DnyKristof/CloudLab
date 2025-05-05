@@ -89,10 +89,11 @@ jobs:
         run: |
           cd dev/backend
           sed -i "s|\(image: .*/${{ env.IMAGE_NAME_BACKEND }}:\)[^ ]*|\1${GIT_SHA::7}|" deployment.yaml
+          git add deployment.yaml
           cd ../frontend
           sed -i "s|\(image: .*/${{ env.IMAGE_NAME_FRONTEND }}:\)[^ ]*|\1${GIT_SHA::7}|" deployment.yaml
+          git add deployment.yaml
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add dev/backend/deployment.yaml dev/frontend/deployment.yaml
           git commit -m "Update image tag to ${GIT_SHA} in deployment.yaml"
           git push
