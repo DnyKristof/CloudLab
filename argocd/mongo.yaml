@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: facedetection-app
+  name: mongo-app
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: https://github.com/DnyKristof/CloudLab.git
     targetRevision: HEAD
-    path: dev/backend
+    path: dev/database
   destination:
     server: https://kubernetes.default.svc
     namespace: facedetection
