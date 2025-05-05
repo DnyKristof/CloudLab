@@ -6,7 +6,7 @@ from pymongo import MongoClient
 class MongoDB:
     _initiated = None
     def __init__(self):
-        username = os.getenv("MONGODB_NAME")
+        username = os.getenv("MONGODB_USERNAME")
         if username is None:
             raise Exception("MONGODB_NAME not set")
         
