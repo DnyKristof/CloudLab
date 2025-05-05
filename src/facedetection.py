@@ -3,12 +3,17 @@ from fastapi.responses import StreamingResponse
 import cv2
 import numpy as np
 import io
+from mongodb import MongoInit
 
 app = FastAPI()
+db = MongoInit()
 
 
 @app.get("/health")
 def health_check():
+    mongodb_status = db.health_check()
+    if "error" in mongodb_status:
+        return {"status": "error", "mongodb": mongodb_status["error"]}
     return {"status": "ok"}
 
 

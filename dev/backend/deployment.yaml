@@ -30,4 +30,17 @@ spec:
             port: 5000
           initialDelaySeconds: 3
           periodSeconds: 5
+        env:
+        - name: MONGODB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: username
+        - name: MONGODB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: password
+        
+
 
