@@ -3,14 +3,15 @@ from fastapi.responses import StreamingResponse
 import cv2
 import numpy as np
 import io
-from mongodb import MongoInit
+from mongodb import MongoInit, MongoDB
+from pymongo.results import InsertOneResult
 
 from fastapi.middleware.cors import CORSMiddleware
 
 
 
 app = FastAPI()
-db = MongoInit()
+db : MongoDB = MongoInit()
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,7 +30,7 @@ def health_check():
 
 
 @app.post("/detect_faces")
-async def detect_faces(file: UploadFile = File(...), description: str = Form("")):
+async def detect_faces(file: UploadFile = File(...), description: str = Form(""), username: str = Form("")):
 
     contents = await file.read()
     nparr = np.frombuffer(contents, np.uint8)
@@ -53,6 +54,21 @@ async def detect_faces(file: UploadFile = File(...), description: str = Form("")
 
     for (x, y, w, h) in faces:
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+    result : InsertOneResult = db.get_collection("images").insert_one(
+        {
+            "description": description,
+            "username": username,
+            "faces": len(faces)
+        }
+    )
+
+    if result.acknowledged:
+        print(f"Image data inserted with id: {result.inserted_id}")
+    else:
+        print("Failed to insert image data")
+
+
 
 
     _, img_encoded = cv2.imencode(".jpg", image)

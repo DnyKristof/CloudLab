@@ -1,5 +1,7 @@
 import os
 from pymongo import MongoClient
+from pymongo.database import Database
+from pymongo.collection import Collection
 
 
 
@@ -16,10 +18,10 @@ class MongoDB:
         
         uri = f"mongodb://{username}:{password}@mongodb-service:27017" #mongodb-service
 
-        self.client = MongoClient(uri)
-        self.database = self.client.facedetection
+        self.client : MongoClient = MongoClient(uri)
+        self.database : Database  = self.client.facedetection
 
-    def get_collection(self,collection):
+    def get_collection(self,collection : str) -> Collection:
         return self.database[collection]
     
     def health_check(self):
