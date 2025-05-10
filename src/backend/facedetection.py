@@ -55,18 +55,18 @@ async def detect_faces(file: UploadFile = File(...), description: str = Form("")
     for (x, y, w, h) in faces:
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-    result : InsertOneResult = db.get_collection("images").insert_one(
-        {
-            "description": description,
-            "username": username,
-            "faces": len(faces)
-        }
-    )
+#    result : InsertOneResult = db.get_collection("images").insert_one(
+#        {
+#            "description": description,
+#            "username": username,
+#            "faces": len(faces)
+#        }
+#    )
 
-    if result.acknowledged:
-        print(f"Image data inserted with id: {result.inserted_id}")
-    else:
-        print("Failed to insert image data")
+#    if result.acknowledged:
+#        print(f"Image data inserted with id: {result.inserted_id}")
+#    else:
+#        print("Failed to insert image data")
 
 
 
