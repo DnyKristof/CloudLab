@@ -17,13 +17,13 @@ app = FastAPI()
 db : MongoDB = MongoInit()
 
 producer = KafkaProducer(
-    bootstrap_servers='kafka.facedetection.svc.cluster.local:9092', 
+    bootstrap_servers='kafka.facedetection.svc.cluster.local',  #kafka.facedetection.svc.cluster.local
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
 
 consumer = KafkaConsumer(
     "face-detections",
-    bootstrap_servers='kafka.facedetection.svc.cluster.local:9092',
+    bootstrap_servers='kafka.facedetection.svc.cluster.local',
     value_deserializer=lambda m: json.loads(m.decode('utf-8')),
     group_id="face-detection-group"
 )
@@ -45,10 +45,13 @@ async def notify_clients(message: dict):
             clients.remove(ws)
 
 def start_kafka_loop():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    for msg in consumer:
-        loop.run_until_complete(notify_clients(msg.value))
+    try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        for msg in consumer:
+            loop.run_until_complete(notify_clients(msg.value))
+    except Exception as e:
+        print(f"[Kafka Loop Error] {e}")
 
 
 @app.get("/health")

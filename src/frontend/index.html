@@ -87,14 +87,15 @@
       }
     });
 
-    const socket = new WebSocket(`ws://${window.location.host}/ws`);
+    const socket = new WebSocket(`ws://${window.location.host}/ws`); 
 
     socket.onmessage = function (event) {
       const msg = JSON.parse(event.data);
       const box = document.createElement("div");
       box.className = "notification";
       box.innerText = `👤 ${msg.faces_detected ?? msg.faces} face(s) by ${msg.username}\n📝 ${msg.description}`;
-      notificationBar.prepend(box); 
+      notificationBar.prepend(box);
+      console.log(msg);
     };
 
     socket.onerror = function (error) {
@@ -103,3 +104,6 @@
   </script>
 </body>
 </html>
+
+<!--
+  ${window.location.host}
