@@ -39,7 +39,7 @@ spec:
             - name: KAFKA_CFG_ADVERTISED_LISTENERS
               value: "PLAINTEXT://$(POD_NAME).kafka.facedetection.svc.cluster.local:9092"
             - name: KAFKA_CFG_LOG_DIRS
-              value: "/bitnami/kafka/data"
+              value: "/bitnami/kafka/data/kafka-logs"
             - name: KAFKA_CFG_NODE_ID
               value: "0"
             - name: KAFKA_KRAFT_CLUSTER_ID
@@ -62,7 +62,7 @@ spec:
            
           volumeMounts:
             - name: data
-              mountPath: /bitnami/kafka/data/kafka-logs
+              mountPath: /bitnami/kafka/data
   volumeClaimTemplates:
     - metadata:
         name: data
