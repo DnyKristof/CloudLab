@@ -45,16 +45,16 @@ spec:
                 0@kafka-0.kafka.facedetection.svc.cluster.local:9093,
                 1@kafka-1.kafka.facedetection.svc.cluster.local:9093,
                 2@kafka-2.kafka.facedetection.svc.cluster.local:9093
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
           ports:
             - containerPort: 9092
               name: broker
             - containerPort: 9093
               name: controller
-          env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
+           
           volumeMounts:
             - name: data
               mountPath: /bitnami/kafka/data
