@@ -62,7 +62,7 @@ spec:
            
           volumeMounts:
             - name: data
-              mountPath: /bitnami/kafka/data
+              mountPath: /bitnami/kafka/data/kafka-logs
   volumeClaimTemplates:
     - metadata:
         name: data
