@@ -4,5 +4,5 @@ metadata:
   name: longhorn
 provisioner: driver.longhorn.io
 allowVolumeExpansion: true
-reclaimPolicy: Retain
+reclaimPolicy: Delete
 volumeBindingMode: Immediate

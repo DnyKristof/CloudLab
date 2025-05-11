@@ -23,7 +23,7 @@ class MongoDB:
             raise Exception("MONGODB_HOST not set")
         
         
-        uri = f"mongodb://{username}:{password}@mongodb-service:27017" #mongodb-service
+        uri = f"mongodb://{username}:{password}@mongodb-service.facedetection.svc.cluster.local:27017/?authSource=admin" #mongodb-service
         print("Mongodb_uri: ",uri)
 
 
