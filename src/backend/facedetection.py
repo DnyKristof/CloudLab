@@ -136,9 +136,9 @@ async def websocket_endpoint(websocket: WebSocket):
     except:
         clients.remove(websocket)
 
-@app.on_event("startup")
-def startup_event():
-    threading.Thread(target=start_kafka_loop, daemon=True).start()
+#@app.on_event("startup")
+#def startup_event():
+#    threading.Thread(target=start_kafka_loop, daemon=True).start()
 
 if __name__ == "__main__":
     import uvicorn
