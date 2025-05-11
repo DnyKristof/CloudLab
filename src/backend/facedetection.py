@@ -17,13 +17,13 @@ app = FastAPI()
 db : MongoDB = MongoInit()
 
 producer = KafkaProducer(
-    bootstrap_servers='kafka.facedetection.svc.cluster.local',  #kafka.facedetection.svc.cluster.local
+    bootstrap_servers='kafka.facedetection.svc.cluster.local:9092',  #kafka.facedetection.svc.cluster.local
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
 
 consumer = KafkaConsumer(
     "face-detections",
-    bootstrap_servers='kafka.facedetection.svc.cluster.local',
+    bootstrap_servers='kafka.facedetection.svc.cluster.local:9092',
     value_deserializer=lambda m: json.loads(m.decode('utf-8')),
     group_id="face-detection-group"
 )
