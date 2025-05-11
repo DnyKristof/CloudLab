@@ -41,6 +41,8 @@ spec:
             secretKeyRef:
               name: mongodb-secret
               key: password
+        - name: MONGODB_HOST
+          value: mongodb-service
         resources:
           requests:
             cpu: 100m

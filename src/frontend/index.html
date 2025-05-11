@@ -42,6 +42,19 @@
         alert("Face detection failed.");
       }
     });
+
+  const socket = new WebSocket(`ws://${window.location.host}/ws`); 
+
+  socket.onmessage = function (event) {
+    const msg = JSON.parse(event.data);
+    alert(`👤 ${msg.faces_detected} face(s) detected by ${msg.username}`);
+    
+    console.log("Notification from Kafka:", msg);
+  };
+
+  socket.onerror = function (error) {
+    console.error("WebSocket error:", error);
+  };
   </script>
 </body>
 </html>

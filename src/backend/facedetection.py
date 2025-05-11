@@ -1,11 +1,14 @@
-from fastapi import FastAPI, File, UploadFile, Form
+from fastapi import FastAPI, File, UploadFile, Form, WebSocket
 from fastapi.responses import StreamingResponse
 import cv2
 import numpy as np
 import io
+import asyncio
+import threading
 from mongodb import MongoInit, MongoDB
 from pymongo.results import InsertOneResult
-
+import json
+from kafka import KafkaProducer,KafkaConsumer
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -13,12 +16,39 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 db : MongoDB = MongoInit()
 
+producer = KafkaProducer(
+    bootstrap_servers='kafka.facedetection.svc.cluster.local:9092', 
+    value_serializer=lambda v: json.dumps(v).encode('utf-8')
+)
+
+consumer = KafkaConsumer(
+    "face-detections",
+    bootstrap_servers='kafka.facedetection.svc.cluster.local:9092',
+    value_deserializer=lambda m: json.loads(m.decode('utf-8')),
+    group_id="face-detection-group"
+)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+clients = []
+
+async def notify_clients(message: dict):
+    for ws in clients:
+        try:
+            await ws.send_text(json.dumps(message))
+        except:
+            clients.remove(ws)
+
+def start_kafka_loop():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    for msg in consumer:
+        loop.run_until_complete(notify_clients(msg.value))
 
 
 @app.get("/health")
@@ -55,18 +85,23 @@ async def detect_faces(file: UploadFile = File(...), description: str = Form("")
     for (x, y, w, h) in faces:
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-#    result : InsertOneResult = db.get_collection("images").insert_one(
-#        {
-#            "description": description,
-#            "username": username,
-#            "faces": len(faces)
-#        }
-#    )
+    result : InsertOneResult = db.get_collection("images").insert_one(
+        {
+            "description": description,
+            "username": username,
+            "faces": len(faces)
+        }
+    )
+    if result.acknowledged:
+        print(f"Image data inserted with id: {result.inserted_id}")
+    else:
+        print("Failed to insert image data")
 
-#    if result.acknowledged:
-#        print(f"Image data inserted with id: {result.inserted_id}")
-#    else:
-#        print("Failed to insert image data")
+    producer.send("face-detections", {
+        "username": username,
+        "description": description,
+        "faces_detected": len(faces)
+    })
 
 
 
@@ -74,6 +109,21 @@ async def detect_faces(file: UploadFile = File(...), description: str = Form("")
     _, img_encoded = cv2.imencode(".jpg", image)
     return StreamingResponse(io.BytesIO(img_encoded.tobytes()), media_type="image/jpeg")
 
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    clients.append(websocket)
+    print(f"Client connected: {websocket.client}")
+    try:
+        while True:
+            await websocket.receive_text()  
+    except:
+        clients.remove(websocket)
+
+@app.on_event("startup")
+def startup_event():
+    threading.Thread(target=start_kafka_loop, daemon=True).start()
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("facedetection:app", host="0.0.0.0", port=5000, reload=False)
+    uvicorn.run("facedetection:app", host="0.0.0.0", port=5000, reload=True)
