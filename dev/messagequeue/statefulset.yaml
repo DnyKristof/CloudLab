@@ -66,12 +66,6 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /bitnami/kafka/data
-  volumeClaimTemplates:
-    - metadata:
-        name: data
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        storageClassName: local-path 
-        resources:
-          requests:
-            storage: 5Gi
+      volumes:
+        - name: data
+          emptyDir: {}
