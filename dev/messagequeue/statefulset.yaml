@@ -36,9 +36,7 @@ spec:
             - name: KAFKA_CFG_LOG_DIRS
               value: "/bitnami/kafka/data"
             - name: KAFKA_CFG_NODE_ID
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
+              value: "echo ${POD_NAME##*-}"
             - name: KAFKA_KRAFT_CLUSTER_ID
               value: "nYSlOzTvSxmIIYJoM52Y6g=="  
             - name: ALLOW_PLAINTEXT_LISTENER
