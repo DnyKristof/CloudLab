@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: cloudlab-facedetection-frontend
-        image: zylean/cloudlab-facedetection-frontend:ecc3faa
+        image: zylean/cloudlab-facedetection-frontend:cd58386
         ports:
         - containerPort: 80
         livenessProbe:
