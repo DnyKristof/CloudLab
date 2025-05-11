@@ -3,22 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <title>Face Detection Upload</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    #notification-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100vh;
+      overflow-y: auto;
+      background-color: #f0f0f0;
+      border-right: 1px solid #ccc;
+      padding: 10px;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    }
+
+    .notification {
+      background-color: #ffffff;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-left: 4px solid #4CAF50;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      opacity: 0;
+      animation: fadeIn 0.5s forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    #main-content {
+      margin-left: 270px;
+      padding: 20px;
+    }
+  </style>
 </head>
 <body>
-  <h2>Upload an image for face detection</h2>
-  <form id="upload-form">
-    <input type="file" name="file" id="file" required><br><br>
-    <input type="text" name="description" id="description" placeholder="Description"><br><br>
-    <input type="text" name="username" id="username" placeholder="Username"><br><br>
-    <button type="submit">Submit</button>
-  </form>
+  <div id="notification-bar"></div>
 
-  <h3>Result:</h3>
-  <img id="result-image" style="max-width: 400px; display: none;" />
+  <div id="main-content">
+    <h2>Upload an image for face detection</h2>
+    <form id="upload-form">
+      <input type="file" name="file" id="file" required><br><br>
+      <input type="text" name="description" id="description" placeholder="Description"><br><br>
+      <input type="text" name="username" id="username" placeholder="Username"><br><br>
+      <button type="submit">Submit</button>
+    </form>
+
+    <h3>Result:</h3>
+    <img id="result-image" style="max-width: 400px; display: none;" />
+  </div>
 
   <script>
     const form = document.getElementById('upload-form');
     const resultImg = document.getElementById('result-image');
+    const notificationBar = document.getElementById('notification-bar');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -43,18 +87,19 @@
       }
     });
 
-  const socket = new WebSocket(`ws://${window.location.host}/ws`); 
+    const socket = new WebSocket(`ws://${window.location.host}/ws`);
 
-  socket.onmessage = function (event) {
-    const msg = JSON.parse(event.data);
-    alert(`👤 ${msg.faces_detected} face(s) detected by ${msg.username}`);
-    
-    console.log("Notification from Kafka:", msg);
-  };
+    socket.onmessage = function (event) {
+      const msg = JSON.parse(event.data);
+      const box = document.createElement("div");
+      box.className = "notification";
+      box.innerText = `👤 ${msg.faces_detected ?? msg.faces} face(s) by ${msg.username}\n📝 ${msg.description}`;
+      notificationBar.prepend(box); 
+    };
 
-  socket.onerror = function (error) {
-    console.error("WebSocket error:", error);
-  };
+    socket.onerror = function (error) {
+      console.error("WebSocket error:", error);
+    };
   </script>
 </body>
 </html>

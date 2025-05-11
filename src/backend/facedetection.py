@@ -114,6 +114,15 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     clients.append(websocket)
     print(f"Client connected: {websocket.client}")
+
+    images = list(db.get_collection("images").find({}, {"_id": 0}))
+    for image in images:
+        try:
+            await websocket.send_text(json.dumps(image))
+        except:
+            clients.remove(websocket)
+            return
+        
     try:
         while True:
             await websocket.receive_text()  
