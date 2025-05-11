@@ -7,7 +7,7 @@ spec:
   selector:
     matchLabels:
       app: cloudlab-facedetection-backend
-      replicas: 2
+  replicas: 2
   template:
     metadata:
       labels:
