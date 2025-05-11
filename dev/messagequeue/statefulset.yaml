@@ -14,7 +14,12 @@ spec:
       labels:
         app: kafka
     spec:
+      securityContext:
+           runAsUser: 1001
+           runAsGroup: 1001
+           fsGroup: 1001
       containers:
+        
         - name: kafka
           image: bitnami/kafka:3.6.0
           imagePullPolicy: IfNotPresent
