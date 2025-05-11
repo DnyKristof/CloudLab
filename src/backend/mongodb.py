@@ -24,9 +24,8 @@ class MongoDB:
         
         
         uri = f"mongodb://{username}:{password}@{host}:27017" #mongodb-service
+        print("Mongodb_uri: ",uri)
 
-        if host == "localhost":
-            uri = f"mongodb://{host}:27017"
 
         self.client : MongoClient = MongoClient(uri)
         self.database : Database  = self.client.facedetection
