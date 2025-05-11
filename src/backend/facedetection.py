@@ -56,6 +56,10 @@ def start_kafka_loop():
 
 @app.get("/health")
 def health_check():
+    return {"status": "ok"}
+
+@app.get("/dbhealth")
+def health_check():
     mongodb_status = db.health_check()
     if "error" in mongodb_status:
         return {"status": "error", "mongodb": mongodb_status["error"]}
